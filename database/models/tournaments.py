@@ -8,10 +8,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.models import Base
 from .tournament_flight_association import tournament_flight_association_table
 from .tournament_hole_association import tournament_hole_association_table
+from .user_tournament_association import user_tournament_association_table
 
 if TYPE_CHECKING:
     from .user import User
     from .hole import Hole
+    from .flights import Flight
 
 
 class Tournament(Base):
@@ -19,11 +21,15 @@ class Tournament(Base):
     max_flights: Mapped[int]
     start: Mapped[datetime]
     end: Mapped[Optional[datetime]]
-    users: Mapped[List['User']] = relationship(
+    flights: Mapped[List['Flight']] = relationship(
         back_populates='tournaments',
         secondary=tournament_flight_association_table,
     )
-    holes: Mapped[List['User']] = relationship(
+    holes: Mapped[List['Hole']] = relationship(
         back_populates='tournaments',
         secondary=tournament_hole_association_table,
+    )
+    users: Mapped[List['User']] = relationship(
+        back_populates='tournaments',
+        secondary=user_tournament_association_table,
     )

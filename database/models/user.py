@@ -1,11 +1,15 @@
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 
 from sqlalchemy import String, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.models import Base
-from database.models.tournament_flight_association import tournament_flight_association_table
 from database.models.user_flight_association import user_flight_association_table
+from database.models.user_tournament_association import user_tournament_association_table
+
+if TYPE_CHECKING:
+    from .flights import Flight
+    from .tournaments import Tournament
 
 
 class User(Base):
@@ -14,11 +18,11 @@ class User(Base):
     last_name: Mapped[Optional[str]] = mapped_column(String(50))
     handicap: Mapped[float]
     status: Mapped[bool]
-    flights: Mapped[List['User']] = relationship(
+    flights: Mapped[List['Flight']] = relationship(
         back_populates='users',
         secondary=user_flight_association_table,
     )
-    tournaments: Mapped[List['User']] = relationship(
+    tournaments: Mapped[List['Tournament']] = relationship(
         back_populates='users',
-        secondary=tournament_flight_association_table,
+        secondary=user_tournament_association_table,
     )
