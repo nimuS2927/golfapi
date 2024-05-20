@@ -38,6 +38,16 @@ async def read_obj(
     return await session.get(obj, obj_id)
 
 
+async def read_objs(
+    session: AsyncSession,
+    obj: Union[*OBJECTS]
+) -> Optional[Union[*OBJECTS]]:
+    stmt = select(obj).order_by(obj.id)
+    result: Result = await session.execute(stmt)
+    objs = result.scalars().all()
+    return list(objs)
+
+
 async def update_obj(
     session: AsyncSession,
     obj: Union[*OBJECTS],
