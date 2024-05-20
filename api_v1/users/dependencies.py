@@ -38,3 +38,16 @@ async def user_by_tg_id(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"User {user_tg_id} not found"
     )
+
+
+async def users_all(
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> models.User:
+    users = await crud_common.read_objs(session, models.User)
+    if users:
+        return users
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Users not found"
+    )

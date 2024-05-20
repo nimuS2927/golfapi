@@ -15,3 +15,4 @@ async def get_user_by_tg_id(
     result: Result = await session.execute(stmt)
     user = result.scalar()
     return user
+
