@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,17 +19,24 @@ from api_v1.users.schemas import (
 router = APIRouter(prefix='/user', tags=['Users'])
 
 
+@router.get('/', response_model=List[schemas.User])
+async def get_users(
+        users: List[models.User] = Depends(user_by_id),
+) -> List[models.User]:
+    return users
+
+
 @router.get('/{user_id}/', response_model=schemas.User)
 async def get_user(
         user: models.User = Depends(user_by_id),
-):
+) -> models.User:
     return user
 
 
 @router.get('/tg/{user_tg_id}/', response_model=schemas.User)
 async def get_user(
         user: models.User = Depends(user_by_tg_id),
-):
+) -> models.User:
     return user
 
 
@@ -39,7 +48,7 @@ async def get_user(
 async def create_user(
     user_in: CreateUser,
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-):
+) -> models.User:
     return await crud_common.create_obj(
         session=session,
         obj_in=user_in,
@@ -52,7 +61,7 @@ async def update_user(
     user_update: UpdateUser,
     user: models.User = Depends(user_by_id),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-):
+) -> models.User:
     return await crud_common.update_obj(
         session=session,
         obj=user,
@@ -61,11 +70,11 @@ async def update_user(
 
 
 @router.patch('/{user_id}/', response_model=schemas.User)
-async def update_user(
+async def update_user_partial(
     user_update: UpdateUserPartial,
     user: models.User = Depends(user_by_id),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-):
+) -> models.User:
     return await crud_common.update_obj(
         session=session,
         obj=user,
@@ -81,7 +90,7 @@ async def update_user(
 async def update_user(
         user: models.User = Depends(user_by_id),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-):
+) -> None:
     await crud_common.delete_obj(
         session=session,
         obj=user
