@@ -9,13 +9,15 @@ from database.models import Admin
 router = APIRouter(prefix='/admins', tags=['Admins'])
 
 
-# @router.get('/{admin_id}/', response_model=AdminSchemas)
-# async def get_admin_by_id(
-#         admin: AdminSchemas = Depends(admin_by_id),
-# ):
-#     return admin
-#
-#
+@router.get('/{admin_id}/', response_model=AdminSchemas)
+async def get_admin_by_id(
+        admin: AdminSchemas = Depends(admin_by_id),
+        superuser: bool = Depends(validate_superuser),
+):
+    if superuser:
+        return admin
+
+
 @router.get('/', response_model=AdminSchemas)
 async def get_admin_by_login(
         login: str,
