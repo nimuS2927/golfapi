@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class Tournament(Base):
-    name: Mapped[str] = mapped_column(String(3000))
+    name: Mapped[str] = mapped_column(String(300))
     max_flights: Mapped[int]
     start: Mapped[datetime]
     end: Mapped[Optional[datetime]]
