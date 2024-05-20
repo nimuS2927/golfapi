@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.models import Base
 from .tournament_flight_association import tournament_flight_association_table
+from .tournament_hole_association import tournament_hole_association_table
 
 if TYPE_CHECKING:
     from .user import User
@@ -24,5 +25,5 @@ class Tournament(Base):
     )
     holes: Mapped[List['User']] = relationship(
         back_populates='tournaments',
-        secondary=tournament_flight_association_table,
+        secondary=tournament_hole_association_table,
     )

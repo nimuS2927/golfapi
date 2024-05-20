@@ -3,8 +3,8 @@ from sqlalchemy import Table, Column, ForeignKey, UniqueConstraint
 from .base import Base
 
 
-tournament_flight_association_table = Table(
-    "tournament_flight_association",
+tournament_hole_association_table = Table(
+    "tournament_hole_association_table",
     Base.metadata,
     Column("tournament_id", ForeignKey('tournaments.id'), nullable=False),
     Column("hole_id", ForeignKey('holes.id'), nullable=False),
