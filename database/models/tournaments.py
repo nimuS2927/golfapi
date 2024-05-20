@@ -10,6 +10,7 @@ from .tournament_flight_association import tournament_flight_association_table
 
 if TYPE_CHECKING:
     from .user import User
+    from .hole import Hole
 
 
 class Tournament(Base):
@@ -18,6 +19,10 @@ class Tournament(Base):
     start: Mapped[datetime]
     end: Mapped[Optional[datetime]]
     users: Mapped[List['User']] = relationship(
+        back_populates='tournaments',
+        secondary=tournament_flight_association_table,
+    )
+    holes: Mapped[List['User']] = relationship(
         back_populates='tournaments',
         secondary=tournament_flight_association_table,
     )
