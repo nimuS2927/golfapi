@@ -13,6 +13,7 @@ class User(Base):
     first_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[Optional[str]] = mapped_column(String(50))
     handicap: Mapped[float]
+    status: Mapped[bool]
     flights: Mapped[List['User']] = relationship(
         back_populates='users',
         secondary=user_flight_association_table,
