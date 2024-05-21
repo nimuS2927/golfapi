@@ -3,7 +3,8 @@ from typing import Annotated, Optional, List, TYPE_CHECKING
 from annotated_types import Ge, Le
 
 if TYPE_CHECKING:
-    from database.models import Tournament, Score
+    from api_v1.tournaments.schemas import Tournament
+    from api_v1.scores.schemas import Score
 
 
 class HoleBase(BaseModel):

@@ -5,7 +5,10 @@ from typing import Annotated, Optional, List, TYPE_CHECKING
 from annotated_types import MinLen, MaxLen
 
 if TYPE_CHECKING:
-    from database.models import Tournament, User, Score, TotalScore
+    from api_v1.tournaments.schemas import Tournament
+    from api_v1.users.schemas import User
+    from api_v1.scores.schemas import Score
+    from api_v1.totalscores.schemas import TotalScore
 
 
 class FlightBase(BaseModel):
