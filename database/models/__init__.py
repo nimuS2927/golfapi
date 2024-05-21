@@ -5,6 +5,8 @@ __all__ = (
     "Flight",
     "Tournament",
     "Hole",
+    "Score",
+    "TotalScore",
 )
 
 from .base import Base
@@ -14,4 +16,5 @@ from .user import User
 from .flights import Flight
 from .tournaments import Tournament
 from .hole import Hole
+from .score import Score, TotalScore
 
