@@ -23,6 +23,7 @@ class Tournament(Base):
     max_flights: Mapped[int]
     start: Mapped[datetime]
     end: Mapped[Optional[datetime]]
+    type: Mapped[str]
     hcp: Mapped[Optional[int]] = mapped_column(default=None, server_default=None)
     flights: Mapped[List['Flight']] = relationship(
         back_populates='tournaments',
