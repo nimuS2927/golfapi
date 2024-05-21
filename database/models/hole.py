@@ -9,6 +9,7 @@ from .tournament_hole_association import tournament_hole_association_table
 
 if TYPE_CHECKING:
     from .tournaments import Tournament
+    from .score import Score
 
 
 class Hole(Base):
@@ -18,4 +19,7 @@ class Hole(Base):
     tournaments: Mapped[List['Tournament']] = relationship(
         back_populates='holes',
         secondary=tournament_hole_association_table,
+    )
+    scores: Mapped[List['Score']] = relationship(
+        back_populates='hole',
     )

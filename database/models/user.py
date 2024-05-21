@@ -10,6 +10,7 @@ from database.models.user_tournament_association import user_tournament_associat
 if TYPE_CHECKING:
     from .flights import Flight
     from .tournaments import Tournament
+    from .score import Score
 
 
 class User(Base):
@@ -26,4 +27,7 @@ class User(Base):
     tournaments: Mapped[List['Tournament']] = relationship(
         back_populates='users',
         secondary=user_tournament_association_table,
+    )
+    scores: Mapped[List['Score']] = relationship(
+        back_populates='user'
     )

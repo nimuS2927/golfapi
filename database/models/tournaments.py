@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from .user import User
     from .hole import Hole
     from .flights import Flight
+    from .score import Score
 
 
 class Tournament(Base):
@@ -33,4 +34,7 @@ class Tournament(Base):
     users: Mapped[List['User']] = relationship(
         back_populates='tournaments',
         secondary=user_tournament_association_table,
+    )
+    scores: Mapped[List['Score']] = relationship(
+        back_populates='tournament'
     )
