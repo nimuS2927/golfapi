@@ -19,11 +19,11 @@ class User(Base):
     handicap: Mapped[float]
     image_src: Mapped[Optional[str]]
     status: Mapped[bool]
-    flights: Mapped[Optional[List['Flight']]] = relationship(
+    flights: Mapped[List['Flight']] = relationship(
         back_populates='users',
         secondary=user_flight_association_table,
     )
-    tournaments: Mapped[Optional[List['Tournament']]] = relationship(
+    tournaments: Mapped[List['Tournament']] = relationship(
         back_populates='users',
         secondary=user_tournament_association_table,
     )
