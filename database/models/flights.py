@@ -15,11 +15,11 @@ if TYPE_CHECKING:
 
 
 class Flight(Base):
-    users: Mapped[List['User']] = relationship(
+    users: Mapped[Optional[List['User']]] = relationship(
         back_populates='flights',
         secondary=user_flight_association_table,
     )
-    tournaments: Mapped[List['Tournament']] = relationship(
+    tournaments: Mapped[Optional[List['Tournament']]] = relationship(
         back_populates='flights',
         secondary=tournament_flight_association_table,
     )

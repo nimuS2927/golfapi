@@ -15,7 +15,7 @@ class Hole(Base):
     number: Mapped[int]
     par: Mapped[int]
     difficulty: Mapped[int]
-    tournaments: Mapped[List['Tournament']] = relationship(
+    tournaments: Mapped[Optional[List['Tournament']]] = relationship(
         back_populates='holes',
         secondary=tournament_hole_association_table,
     )

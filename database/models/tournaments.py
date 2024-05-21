@@ -21,15 +21,15 @@ class Tournament(Base):
     max_flights: Mapped[int]
     start: Mapped[datetime]
     end: Mapped[Optional[datetime]]
-    flights: Mapped[List['Flight']] = relationship(
+    flights: Mapped[Optional[List['Flight']]] = relationship(
         back_populates='tournaments',
         secondary=tournament_flight_association_table,
     )
-    holes: Mapped[List['Hole']] = relationship(
+    holes: Mapped[Optional[List['Hole']]] = relationship(
         back_populates='tournaments',
         secondary=tournament_hole_association_table,
     )
-    users: Mapped[List['User']] = relationship(
+    users: Mapped[Optional[List['User']]] = relationship(
         back_populates='tournaments',
         secondary=user_tournament_association_table,
     )
