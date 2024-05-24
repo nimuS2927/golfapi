@@ -7,12 +7,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.models import Base
 from .tournament_flight_association import tournament_flight_association_table
-# from .tournament_hole_association import tournament_hole_association_table
 from .user_tournament_association import user_tournament_association_table
 
 if TYPE_CHECKING:
     from .user import User
-    from .hole import Hole
     from .flights import Flight
     from .score import Score
     from .score import TotalScore
@@ -30,10 +28,6 @@ class Tournament(Base):
         back_populates='tournaments',
         secondary=tournament_flight_association_table,
     )
-    # holes: Mapped[List['Hole']] = relationship(
-    #     back_populates='tournaments',
-    #     secondary=tournament_hole_association_table,
-    # )
     users: Mapped[List['User']] = relationship(
         back_populates='tournaments',
         secondary=user_tournament_association_table,
