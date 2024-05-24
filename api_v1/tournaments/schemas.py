@@ -1,28 +1,19 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, constr
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Annotated, Optional, List, TYPE_CHECKING
 from annotated_types import MinLen, MaxLen
-
-if TYPE_CHECKING:
-    from api_v1.users.schemas import User
-    from api_v1.scores.schemas import Score
-    from api_v1.totalscores.schemas import TotalScore
-    from api_v1.holes.schemas import Hole
-    from api_v1.flights.schemas import Flight
+from pydantic.types import NaiveDatetime
 
 
 class TournamentBase(BaseModel):
     name: Annotated[str, MinLen(3), MaxLen(300)]
     type: str
     max_flights: int
-    start: datetime
-    end: Optional[datetime] = None
+    status: bool = False
+    start: NaiveDatetime = Field(..., examples=['fmt: YYYY-MM-DD or YYYY-MM-DD HH:MM'])
+    end: NaiveDatetime = Field(..., examples=['fmt: YYYY-MM-DD or YYYY-MM-DD HH:MM'])
     hcp: Optional[int] = None
-    flights: Optional[List['Flight']] = None
-    holes: Optional[List['Hole']] = None
-    users: Optional[List['User']] = None
-    scores: Optional[List['Score']] = None
 
 
 class CreateTournament(TournamentBase):
@@ -37,9 +28,17 @@ class UpdateTournamentPartial(TournamentBase):
     name: Optional[Annotated[str, MinLen(3), MaxLen(300)]] = None
     type: str = None
     max_flights: Optional[int] = None
-    start: Optional[datetime] = None
+    start: NaiveDatetime = Field(None, examples=['fmt: YYYY-MM-DD or YYYY-MM-DD HH:MM'])
+    end: NaiveDatetime = Field(None, examples=['fmt: YYYY-MM-DD or YYYY-MM-DD HH:MM'])
+    hcp: Optional[int] = None
 
 
 class Tournament(TournamentBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
+
+
+class TournamentId(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    tournament_id: int
+

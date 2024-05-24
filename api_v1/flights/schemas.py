@@ -4,18 +4,12 @@ from pydantic import BaseModel, ConfigDict
 from typing import Annotated, Optional, List, TYPE_CHECKING
 from annotated_types import MinLen, MaxLen
 
-if TYPE_CHECKING:
-    from api_v1.tournaments.schemas import Tournament
-    from api_v1.users.schemas import User
-    from api_v1.scores.schemas import Score
-    from api_v1.totalscores.schemas import TotalScore
+from api_v1.users.schemas import User
+from api_v1.tournaments.schemas import Tournament
 
 
 class FlightBase(BaseModel):
-    tournaments: Optional[List['Tournament']] = None
-    users: Optional[List['User']] = None
-    scores: Optional[List['Score']] = None
-    totalscores: Optional[List['TotalScore']] = None
+    name: str
 
 
 class CreateFlight(FlightBase):
@@ -23,11 +17,13 @@ class CreateFlight(FlightBase):
 
 
 class UpdateFlight(FlightBase):
-    pass
+    users: Optional[List[User]]
+    tournaments: Optional[List[Tournament]]
 
 
 class UpdateFlightPartial(FlightBase):
-    pass
+    users: Optional[List[User]] = None
+    tournaments: Optional[List[Tournament]] = None
 
 
 class Flight(FlightBase):

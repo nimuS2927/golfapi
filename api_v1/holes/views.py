@@ -27,14 +27,14 @@ async def get_holes(
 
 
 @router.get('/{hole_id}/', response_model=schemas.Hole)
-async def get_hole(
+async def get_hole_by_id(
         hole: models.Hole = Depends(hole_by_id),
 ) -> models.Hole:
     return hole
 
 
-@router.get('/{hole_number}/', response_model=schemas.Hole)
-async def get_hole(
+@router.get('/number/{hole_number}/', response_model=schemas.Hole)
+async def get_hole_by_number(
         hole: models.Hole = Depends(hole_by_number),
 ) -> models.Hole:
     return hole
@@ -87,7 +87,7 @@ async def update_hole_partial(
     '/{hole_id}/',
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def update_hole(
+async def delete_hole(
         hole: models.Hole = Depends(hole_by_id),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> None:

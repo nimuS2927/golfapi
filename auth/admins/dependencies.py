@@ -26,7 +26,7 @@ async def admin_by_id(
 
 
 async def admin_by_login_for_superuser(
-        admin_login: Annotated[int, Path],
+        admin_login: Annotated[str, Path],
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> Optional[Admin]:
     admin = await auth_crud.get_admin_by_login_for_superuser(

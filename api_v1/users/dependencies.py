@@ -1,7 +1,8 @@
-from typing import Annotated
-from fastapi import Path, Depends, HTTPException, status
+from typing import Annotated, List
+from fastapi import Path, Depends, HTTPException, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api_v1.users.schemas import UserId
 from api_v1.common_crud import crud as crud_common
 from api_v1.users import crud
 from database import models
@@ -40,9 +41,23 @@ async def user_by_tg_id(
     )
 
 
-async def users_all(
+async def user_by_tg_id_body(
+        user_tg_id: Annotated[UserId, Body],
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> models.User:
+    user = await crud.get_user_by_tg_id(session, user_tg_id.user_tg_id)
+    if user:
+        return user
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"User {user_tg_id.user_tg_id} not found"
+    )
+
+
+async def users_all(
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> List[models.User]:
     users = await crud_common.read_objs(session, models.User)
     if users:
         return users

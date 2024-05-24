@@ -80,7 +80,7 @@ async def update_flight_partial(
     '/{flight_id}/',
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def update_flight(
+async def delete_flight(
         flight: models.Flight = Depends(flight_by_id),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> None:

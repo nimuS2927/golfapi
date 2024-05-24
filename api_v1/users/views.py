@@ -7,7 +7,7 @@ from database.helper_for_db import db_helper
 from database import models
 
 from api_v1.common_crud import crud as crud_common
-from api_v1.users.dependencies import user_by_id, user_by_tg_id
+from api_v1.users.dependencies import user_by_id, user_by_tg_id, users_all
 from api_v1.users import schemas
 from api_v1.users.schemas import (
     CreateUser,
@@ -21,20 +21,20 @@ router = APIRouter(prefix='/user', tags=['Users'])
 
 @router.get('/', response_model=List[schemas.User])
 async def get_users(
-        users: List[models.User] = Depends(user_by_id),
+        users: List[models.User] = Depends(users_all),
 ) -> List[models.User]:
     return users
 
 
 @router.get('/{user_id}/', response_model=schemas.User)
-async def get_user(
+async def get_user_by_id(
         user: models.User = Depends(user_by_id),
 ) -> models.User:
     return user
 
 
 @router.get('/tg/{user_tg_id}/', response_model=schemas.User)
-async def get_user(
+async def get_user_by_tg_id(
         user: models.User = Depends(user_by_tg_id),
 ) -> models.User:
     return user
@@ -87,7 +87,7 @@ async def update_user_partial(
     '/{user_id}/',
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def update_user(
+async def delete_user(
         user: models.User = Depends(user_by_id),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> None:

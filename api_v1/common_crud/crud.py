@@ -1,21 +1,41 @@
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.engine import Result
 
 from api_v1.users.schemas import CreateUser, UpdateUser, UpdateUserPartial
+from api_v1.tournaments.schemas import CreateTournament, UpdateTournament, UpdateTournamentPartial
+from api_v1.totalscores.schemas import CreateTotalScore, UpdateTotalScore, UpdateTotalScorePartial
+from api_v1.scores.schemas import CreateScore, UpdateScore, UpdateScorePartial
+from api_v1.flights.schemas import CreateFlight, UpdateFlight, UpdateFlightPartial
+from api_v1.holes.schemas import CreateHole, UpdateHole, UpdateHolePartial
 from auth.admins.schemas import CreateAdmin
-from database.models import User, Admin
+from database.models import User, Admin, Tournament, Score, TotalScore, Flight, Hole
 
 
-OBJECTS = [User, Admin]
+OBJECTS = [User, Admin, Tournament, Score, TotalScore, Flight, Hole]
 OBJ_CREATE = [
     CreateUser,
+    CreateScore,
+    CreateTotalScore,
+    CreateTournament,
+    CreateHole,
+    CreateFlight,
 ]
 OBJ_UPDATE = [
     UpdateUser,
     UpdateUserPartial,
+    UpdateScore,
+    UpdateScorePartial,
+    UpdateTotalScore,
+    UpdateTotalScorePartial,
+    UpdateTournament,
+    UpdateTournamentPartial,
+    UpdateHole,
+    UpdateHolePartial,
+    UpdateFlight,
+    UpdateFlightPartial,
 ]
 
 
@@ -41,7 +61,7 @@ async def read_obj(
 async def read_objs(
     session: AsyncSession,
     obj: Union[*OBJECTS]
-) -> Optional[Union[*OBJECTS]]:
+) -> Optional[List[Union[*OBJECTS]]]:
     stmt = select(obj).order_by(obj.id)
     result: Result = await session.execute(stmt)
     objs = result.scalars().all()

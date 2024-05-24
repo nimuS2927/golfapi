@@ -31,7 +31,7 @@ async def get_admin_by_login(
 
 async def get_admin_by_login_for_superuser(
     session: AsyncSession,
-    admin_login: int
+    admin_login: str
 ) -> Optional[Admin]:
     stmt = select(Admin).where(Admin.login == admin_login)
     result: Result = await session.execute(stmt)

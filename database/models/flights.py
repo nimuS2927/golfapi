@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 
 class Flight(Base):
+    name: Mapped[str] = mapped_column(String(50), unique=True)
     users: Mapped[List['User']] = relationship(
         back_populates='flights',
         secondary=user_flight_association_table,

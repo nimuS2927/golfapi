@@ -11,12 +11,14 @@ if TYPE_CHECKING:
     from .flights import Flight
     from .tournaments import Tournament
     from .score import Score
+    from .score import TotalScore
 
 
 class User(Base):
     id_telegram: Mapped[int] = mapped_column(unique=True)
     first_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[Optional[str]] = mapped_column(String(50))
+    phone: Mapped[str] = mapped_column(String(11))
     handicap: Mapped[float]
     image_src: Mapped[Optional[str]]
     status: Mapped[bool]
@@ -31,3 +33,4 @@ class User(Base):
     scores: Mapped[List['Score']] = relationship(
         back_populates='user'
     )
+    totalscore: Mapped['TotalScore'] = relationship(back_populates='user')

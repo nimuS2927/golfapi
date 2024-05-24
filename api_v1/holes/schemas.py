@@ -11,8 +11,6 @@ class HoleBase(BaseModel):
     number: Annotated[int, Ge(1), Le(18)]
     par: Annotated[int, Ge(3), Le(5)]
     difficulty: Annotated[int, Ge(1), Le(18)]
-    tournaments: Optional[List['Tournament']] = None
-    scores: Optional[List['Score']] = None
 
 
 class CreateHole(HoleBase):

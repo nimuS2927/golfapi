@@ -23,8 +23,8 @@ async def middleware_api_v1(
         response = await call_next(request)
         return response
     else:
+        credentials = request.headers.get('Authorization'),
         try:
-            credentials = request.headers.get('Authorization'),
             scheme, token_str = credentials[0].split()
             if token_str:
                 token = decode_jwt(token_str)
