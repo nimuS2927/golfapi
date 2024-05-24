@@ -8,6 +8,7 @@ from database.models import Base
 
 if TYPE_CHECKING:
     from .score import Score
+    from .course import Course
 
 
 class Hole(Base):
@@ -16,4 +17,4 @@ class Hole(Base):
     difficulty: Mapped[int]
     id_course: Mapped[int] = mapped_column(ForeignKey('courses.id', ondelete="SET NULL"))
     scores: Mapped[List['Score']] = relationship(back_populates='hole')
-
+    course: Mapped['Course'] = relationship(back_populates='holes')
