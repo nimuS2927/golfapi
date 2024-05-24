@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List, TYPE_CHECKING
 
-from sqlalchemy import String
+from sqlalchemy import String, Text, Numeric, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.models import Base
@@ -14,6 +14,6 @@ class Hole(Base):
     number: Mapped[int]
     par: Mapped[int]
     difficulty: Mapped[int]
-    scores: Mapped[List['Score']] = relationship(
-        back_populates='hole',
-    )
+    id_course: Mapped[int] = mapped_column(ForeignKey('courses.id', ondelete="SET NULL"))
+    scores: Mapped[List['Score']] = relationship(back_populates='hole')
+

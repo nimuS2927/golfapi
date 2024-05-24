@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from datetime import datetime
 from typing import Optional, List
 
-from sqlalchemy import String
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.models import Base
@@ -24,6 +24,7 @@ class Tournament(Base):
     type: Mapped[str]
     status: Mapped[Optional[bool]] = mapped_column(default=False, server_default=None)
     hcp: Mapped[Optional[int]] = mapped_column(default=None, server_default=None)
+    id_course: Mapped[Optional[int]] = mapped_column(ForeignKey('courses.id', ondelete="SET NULL"))
     flights: Mapped[List['Flight']] = relationship(
         back_populates='tournaments',
         secondary=tournament_flight_association_table,
