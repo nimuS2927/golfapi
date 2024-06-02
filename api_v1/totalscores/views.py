@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict, Any
 
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +7,7 @@ from database.helper_for_db import db_helper
 from database import models
 
 from api_v1.common_crud import crud as crud_common
+from api_v1.totalscores import crud as crud_totals
 from api_v1.totalscores.dependencies import (
     totalscore_by_id,
     totalscore_by_id_tournament,
@@ -37,16 +38,16 @@ async def get_totalscore_by_id(
     return totalscore
 
 
-@router.get('/{id_tournament}/user/{id_user}', response_model=List[schemas.TotalScore])
+@router.get('/{id_tournament}/user/{id_user}', response_model=schemas.TotalScore)
 async def get_totalscore_by_id_tournament_and_id_user(
         totalscore: models.TotalScore = Depends(totalscore_by_id_tournament_and_id_user),
 ) -> models.TotalScore:
     return totalscore
 
 
-@router.get('/{id_tournament}/', response_model=List[schemas.TotalScore])
+@router.get('/tournament/{id_tournament}/', response_model=List[schemas.TotalScore])
 async def get_totalscore_by_id_tournament(
-        totalscores: models.TotalScore = Depends(totalscore_by_id_tournament),
+        totalscores: List[models.TotalScore] = Depends(totalscore_by_id_tournament),
 ) -> List[models.TotalScore]:
     return totalscores
 
@@ -60,10 +61,9 @@ async def create_totalscore(
     totalscore_in: CreateTotalScore,
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> models.TotalScore:
-    return await crud_common.create_obj(
+    return await crud_totals.create_totalscore(
         session=session,
-        obj_in=totalscore_in,
-        obj=models.TotalScore
+        totalscore_in=totalscore_in,
     )
 
 

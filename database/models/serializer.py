@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, Dict, List
 
 from .admins import Admin
 from .user import User
@@ -7,6 +7,7 @@ from .flights import Flight
 from .tournaments import Tournament
 from .hole import Hole
 from .score import Score, TotalScore
+from .course import Course
 
 OBJS = (
     Admin,
@@ -16,6 +17,7 @@ OBJS = (
     Hole,
     Score,
     TotalScore,
+    Course,
 )
 
 
@@ -24,7 +26,7 @@ def serializer(
         result_dict: dict = None,
         k: str = None,
         v: Any = None,
-):
+) -> Union[Dict[str, Any], List[Dict[str, Any]], str]:
     if isinstance(target, list):
         result_list = []
         for i_target in target:
@@ -43,14 +45,17 @@ def serializer(
     if v:
         if isinstance(v, (str, int, float, datetime)):
             result_dict[k] = v
-        if isinstance(v, (list, tuple)):
+        elif isinstance(v, (list, tuple)):
             result_dict[k] = []
             for elem in v:
                 result = serializer(target=elem)
                 result_dict[k].append(result)
-        if isinstance(v, dict):
+        elif isinstance(v, dict):
             for sub_k, sub_v in v.items():
                 result_dict = serializer(result_dict=result_dict, k=sub_k, v=sub_v)
+        elif isinstance(v, OBJS):
+            new_dict = serializer(target=v)
+            result_dict[k] = new_dict
     if k and not v:
         result_dict[k] = v
     return result_dict

@@ -7,7 +7,7 @@ from database.helper_for_db import db_helper
 from database import models
 
 from api_v1.common_crud import crud as crud_common
-from api_v1.holes.dependencies import hole_by_id, hole_by_number, holes_all
+from api_v1.holes.dependencies import hole_by_id, hole_by_number, holes_all, holes_by_course_id
 from api_v1.holes import schemas
 from api_v1.holes.schemas import (
     CreateHole,
@@ -16,12 +16,12 @@ from api_v1.holes.schemas import (
 )
 
 
-router = APIRouter(prefix='/hole', tags=['Holes'])
+router = APIRouter(prefix='/holes', tags=['Holes'])
 
 
-@router.get('/', response_model=List[schemas.Hole])
+@router.get('/course/{id_course}', response_model=List[schemas.Hole])
 async def get_holes(
-        holes: List[models.Hole] = Depends(holes_all),
+        holes: List[models.Hole] = Depends(holes_by_course_id),
 ) -> List[models.Hole]:
     return holes
 
@@ -31,6 +31,13 @@ async def get_hole_by_id(
         hole: models.Hole = Depends(hole_by_id),
 ) -> models.Hole:
     return hole
+
+
+@router.get('/', response_model=List[schemas.Hole])
+async def get_holes(
+        holes: List[models.Hole] = Depends(holes_all),
+) -> List[models.Hole]:
+    return holes
 
 
 @router.get('/number/{hole_number}/', response_model=schemas.Hole)

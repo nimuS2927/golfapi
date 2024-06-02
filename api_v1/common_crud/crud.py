@@ -10,11 +10,12 @@ from api_v1.totalscores.schemas import CreateTotalScore, UpdateTotalScore, Updat
 from api_v1.scores.schemas import CreateScore, UpdateScore, UpdateScorePartial
 from api_v1.flights.schemas import CreateFlight, UpdateFlight, UpdateFlightPartial
 from api_v1.holes.schemas import CreateHole, UpdateHole, UpdateHolePartial
+from api_v1.courses.schemas import CreateCourse, UpdateCourse, UpdateCoursePartial
 from auth.admins.schemas import CreateAdmin
-from database.models import User, Admin, Tournament, Score, TotalScore, Flight, Hole
+from database.models import User, Admin, Tournament, Score, TotalScore, Flight, Hole, Course
 
 
-OBJECTS = [User, Admin, Tournament, Score, TotalScore, Flight, Hole]
+OBJECTS = [User, Admin, Tournament, Score, TotalScore, Flight, Hole, Course]
 OBJ_CREATE = [
     CreateUser,
     CreateScore,
@@ -22,6 +23,7 @@ OBJ_CREATE = [
     CreateTournament,
     CreateHole,
     CreateFlight,
+    CreateCourse,
 ]
 OBJ_UPDATE = [
     UpdateUser,
@@ -36,6 +38,8 @@ OBJ_UPDATE = [
     UpdateHolePartial,
     UpdateFlight,
     UpdateFlightPartial,
+    UpdateCourse,
+    UpdateCoursePartial,
 ]
 
 

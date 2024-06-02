@@ -7,6 +7,7 @@ from database.helper_for_db import db_helper
 from database import models
 
 from api_v1.common_crud import crud as crud_common
+from api_v1.scores import crud as crud_scores
 from api_v1.scores.dependencies import (
     score_by_id,
     score_by_id_tournament,
@@ -21,7 +22,7 @@ from api_v1.scores.schemas import (
 )
 
 
-router = APIRouter(prefix='/score', tags=['Scores'])
+router = APIRouter(prefix='/scores', tags=['Scores'])
 
 
 @router.get('/', response_model=List[schemas.Score])
@@ -52,7 +53,7 @@ async def get_score_by_id_tournament_and_id_user(
     return scores
 
 
-@router.get('/{id_tournament}/', response_model=List[schemas.Score])
+@router.get('/tournament/{id_tournament}/', response_model=List[schemas.Score])
 async def get_score_by_id_tournament(
         scores: models.Score = Depends(score_by_id_tournament),
 ) -> List[models.Score]:
@@ -72,6 +73,21 @@ async def create_score(
         session=session,
         obj_in=score_in,
         obj=models.Score
+    )
+
+
+@router.post(
+    '/many/',
+    response_model=List[schemas.Score],
+    status_code=status.HTTP_201_CREATED
+)
+async def create_scores(
+    score_in_list: List[CreateScore],
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> models.Score:
+    return await crud_scores.create_scores(
+        session=session,
+        score_in_list=[i.model_dump() for i in score_in_list],
     )
 
 

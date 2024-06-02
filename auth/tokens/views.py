@@ -5,7 +5,7 @@ from core.config import c_project
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from auth.admins.dependencies import admin_by_login
-from auth.admins.schemas import AdminBase
+from auth.admins.schemas import AdminBase, GetAdmin
 from auth.tokens import helpers
 from auth.tokens.utils import decode_jwt
 from database.helper_for_db import db_helper
@@ -40,12 +40,11 @@ async def create_access_token(
     status_code=status.HTTP_201_CREATED
 )
 async def create_full_token(
-        admin_in: AdminBase,
+        admin_in: GetAdmin,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     admin: Admin = await admin_by_login(
-        login=admin_in.login,
-        password=admin_in.password,
+        admin_in=admin_in,
         session=session
     )
     if admin:

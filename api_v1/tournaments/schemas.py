@@ -5,12 +5,16 @@ from typing import Annotated, Optional, List, TYPE_CHECKING
 from annotated_types import MinLen, MaxLen
 from pydantic.types import NaiveDatetime
 
+if TYPE_CHECKING:
+    from api_v1.courses.schemas import Course
+
 
 class TournamentBase(BaseModel):
     name: Annotated[str, MinLen(3), MaxLen(300)]
     type: str
     max_flights: int
     status: bool = False
+    id_course: int
     start: NaiveDatetime = Field(..., examples=['fmt: YYYY-MM-DD or YYYY-MM-DD HH:MM'])
     end: NaiveDatetime = Field(..., examples=['fmt: YYYY-MM-DD or YYYY-MM-DD HH:MM'])
     hcp: Optional[int] = None
@@ -28,6 +32,7 @@ class UpdateTournamentPartial(TournamentBase):
     name: Optional[Annotated[str, MinLen(3), MaxLen(300)]] = None
     type: str = None
     max_flights: Optional[int] = None
+    id_course: int = None
     start: NaiveDatetime = Field(None, examples=['fmt: YYYY-MM-DD or YYYY-MM-DD HH:MM'])
     end: NaiveDatetime = Field(None, examples=['fmt: YYYY-MM-DD or YYYY-MM-DD HH:MM'])
     hcp: Optional[int] = None
@@ -41,4 +46,3 @@ class Tournament(TournamentBase):
 class TournamentId(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     tournament_id: int
-

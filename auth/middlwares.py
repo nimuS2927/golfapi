@@ -2,8 +2,9 @@ from fastapi import FastAPI, Request, HTTPException, status, Depends
 from fastapi.security import HTTPBearer
 from core.config import c_project
 
-http_bearer = HTTPBearer(auto_error=False)
-app_auth = FastAPI(dependencies=[Depends(http_bearer)])
+# http_bearer = HTTPBearer(auto_error=False)
+# app_auth = FastAPI(dependencies=[Depends(http_bearer)])
+app_auth = FastAPI()
 
 # Some middlewares ...
 # @app_auth.middleware("http")

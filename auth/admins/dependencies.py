@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 from fastapi import Path, Depends, HTTPException, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -25,13 +25,28 @@ async def admin_by_id(
     )
 
 
+async def admins_all(
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> Optional[List[Admin]]:
+    admins: Optional[List[Admin]] = await auth_crud.get_admins_all(
+        session=session,
+    )
+    if admins:
+        return admins
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Admins not found"
+    )
+
+
 async def admin_by_login_for_superuser(
-        admin_login: Annotated[str, Path],
+        login: Annotated[str, Path],
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> Optional[Admin]:
     admin = await auth_crud.get_admin_by_login_for_superuser(
         session=session,
-        admin_login=admin_login,
+        admin_login=login,
     )
     if admin:
         return admin
@@ -43,8 +58,7 @@ async def admin_by_login_for_superuser(
 
 
 async def admin_by_login(
-        login: str,
-        password: str,
+        admin_in: GetAdmin,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> Optional[Admin]:
     unauthed_exc = HTTPException(
@@ -52,7 +66,7 @@ async def admin_by_login(
         detail="Invalid username or password",
         headers={"WWW-Authenticate": "Basic"},
     )
-    admin_in = GetAdmin(login=login, password=password)
+
     admin = await auth_crud.get_admin_by_login(
         session=session,
         admin_in=admin_in

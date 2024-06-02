@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import Path, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -42,8 +42,22 @@ async def hole_by_number(
 
 async def holes_all(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-) -> models.Hole:
+) -> List[models.Hole]:
     holes = await crud_common.read_objs(session, models.Hole)
+    if holes:
+        return holes
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Holes not found"
+    )
+
+
+async def holes_by_course_id(
+        id_course: Annotated[int, Path],
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> List[models.Hole]:
+    holes = await crud.get_holes_by_course_id(session=session, id_course=id_course)
     if holes:
         return holes
 

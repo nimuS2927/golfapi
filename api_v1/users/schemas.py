@@ -26,9 +26,10 @@ class UpdateUserPartial(UserBase):
     id_telegram: Optional[int] = None
     first_name: Optional[Annotated[str, MinLen(3), MaxLen(50)]] = None
     last_name: Optional[Annotated[str, MinLen(3), MaxLen(50)]] = None
-    handicap: float = None
+    handicap: Optional[float] = None
     image_src: Optional[str] = None
-    status: bool = None
+    status: Optional[bool] = None
+    phone: Optional[Annotated[str, MinLen(3), MaxLen(50)]] = None
 
 
 class User(UserBase):

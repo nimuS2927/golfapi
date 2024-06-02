@@ -12,8 +12,12 @@ class ScoreBase(BaseModel):
     impacts: Optional[int]
 
 
-class CreateScore(ScoreBase):
-    pass
+class CreateScore(BaseModel):
+    id_tournament: int
+    id_user: Optional[int]
+    id_hole: Optional[int]
+    id_total_score: Optional[int]
+
 
 
 class UpdateScore(ScoreBase):

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict, Any
 
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,7 +7,8 @@ from database.helper_for_db import db_helper
 from database import models
 
 from api_v1.common_crud import crud as crud_common
-from api_v1.courses.dependencies import course_by_id, course_by_name, courses_all
+from api_v1.courses.dependencies import course_by_id, course_by_name, courses_all, courses_all_with_holes, \
+    courses_by_id_with_holes
 from api_v1.courses import schemas
 from api_v1.courses.schemas import (
     CreateCourse,
@@ -16,14 +17,21 @@ from api_v1.courses.schemas import (
 )
 
 
-router = APIRouter(prefix='/course', tags=['Courses'])
+router = APIRouter(prefix='/courses', tags=['Courses'])
 
 
-@router.get('/', response_model=List[schemas.Course])
+@router.get('/holes/', response_model=List[Dict[str, Any]])
 async def get_courses(
-        courses: List[models.Course] = Depends(courses_all),
+        courses: List[models.Course] = Depends(courses_all_with_holes),
 ) -> List[models.Course]:
     return courses
+
+
+@router.get('/holes/{course_id}', response_model=Dict[str, Any])
+async def get_course_by_id_with_holes(
+        course: models.Course = Depends(courses_by_id_with_holes),
+) -> models.Course:
+    return course
 
 
 @router.get('/{course_id}/', response_model=schemas.Course)
@@ -33,8 +41,15 @@ async def get_course_by_id(
     return course
 
 
+@router.get('/', response_model=List[schemas.Course])
+async def get_courses(
+        courses: List[models.Course] = Depends(courses_all),
+) -> List[models.Course]:
+    return courses
+
+
 @router.post('/name/', response_model=schemas.Course)
-async def get_course_by_number(
+async def get_course_by_name(
         course: models.Course = Depends(course_by_name),
 ) -> models.Course:
     return course

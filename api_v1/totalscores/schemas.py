@@ -8,13 +8,15 @@ from api_v1.scores.schemas import Score
 class TotalScoreBase(BaseModel):
     id_tournament: int
     total: int
-    scores: Optional[List[Score]]
+    # scores: Optional[List[Score]]
     id_user: Optional[int] = None
     id_flight: Optional[int] = None
 
 
-class CreateTotalScore(TotalScoreBase):
-    pass
+class CreateTotalScore(BaseModel):
+    id_tournament: int
+    id_user: Optional[int] = None
+    total: int
 
 
 class UpdateTotalScore(TotalScoreBase):
@@ -27,5 +29,10 @@ class UpdateTotalScorePartial(TotalScoreBase):
 
 
 class TotalScore(TotalScoreBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+
+
+class TotalScoreV2(CreateTotalScore):
     model_config = ConfigDict(from_attributes=True)
     id: int

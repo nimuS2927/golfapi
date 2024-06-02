@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,6 +38,17 @@ async def get_admin_by_login_for_superuser(
     admin = result.scalar()
     if admin:
         return admin
+    return None
+
+
+async def get_admins_all(
+    session: AsyncSession,
+) -> Optional[List[Admin]]:
+    stmt = select(Admin).order_by(Admin.id)
+    result: Result = await session.execute(stmt)
+    admins = result.scalars().all()
+    if admins:
+        return list(admins)
     return None
 
 

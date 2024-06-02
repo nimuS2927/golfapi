@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.engine import Result
 
 from database.models import TotalScore
+from .schemas import TotalScoreV2, CreateTotalScore
 
 
 async def get_totalscore_by_id_tournament(
@@ -28,6 +29,34 @@ async def get_totalscore_by_id_tournament_and_id_user(
     stmt = select(TotalScore).where(
         TotalScore.id_tournament == id_tournament,
         TotalScore.id_user == id_user
+    )
+    result: Result = await session.execute(stmt)
+    score = result.scalar()
+    if score:
+        return score
+    return None
+
+
+async def create_totalscore(
+    session: AsyncSession,
+    totalscore_in: CreateTotalScore,
+) -> Optional[TotalScore]:
+    obj_ = TotalScore(**totalscore_in.model_dump())
+    session.add(obj_)
+    await session.commit()
+    obj = await get_totalscore_by_id_v2(
+        session=session,
+        id_totalscore=obj_.id
+    )
+    return obj
+
+
+async def get_totalscore_by_id_v2(
+    session: AsyncSession,
+    id_totalscore: int,
+) -> Optional[TotalScoreV2]:
+    stmt = select(TotalScore).where(
+        TotalScore.id == id_totalscore,
     )
     result: Result = await session.execute(stmt)
     score = result.scalar()

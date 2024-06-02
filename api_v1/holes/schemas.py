@@ -11,6 +11,7 @@ class HoleBase(BaseModel):
     number: Annotated[int, Ge(1), Le(18)]
     par: Annotated[int, Ge(3), Le(5)]
     difficulty: Annotated[int, Ge(1), Le(18)]
+    id_course: int
 
 
 class CreateHole(HoleBase):
@@ -25,6 +26,7 @@ class UpdateHolePartial(HoleBase):
     number: Optional[Annotated[int, Ge(1), Le(18)]] = None
     par: Optional[Annotated[int, Ge(3), Le(5)]] = None
     difficulty: Optional[Annotated[int, Ge(1), Le(18)]] = None
+    id_course: int = None
 
 
 class Hole(HoleBase):

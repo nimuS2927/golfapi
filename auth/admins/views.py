@@ -1,12 +1,47 @@
+from typing import List
+
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from auth.admins.dependencies import admin_by_id, admin_by_login, admin_by_login_for_superuser, validate_superuser
+from auth.admins.dependencies import admin_by_id, admin_by_login, admin_by_login_for_superuser, validate_superuser, \
+    admins_all
 from database.helper_for_db import db_helper
 from auth.admins import crud as auth_crud
-from auth.admins.schemas import CreateAdmin, AdminSchemas, SuperUser
+from auth.admins.schemas import CreateAdmin, AdminSchemas, SuperUser, GetAdmin
 from database.models import Admin
 
 router = APIRouter(prefix='/admins', tags=['Admins'])
+
+
+@router.post('/authorization/{login}/', response_model=AdminSchemas)
+async def get_admin_authorization(
+        superuser: bool = Depends(validate_superuser),
+        admin: Admin = Depends(admin_by_login_for_superuser),
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    if superuser:
+        if admin:
+            return admin
+
+
+@router.post('/authorization/', response_model=AdminSchemas)
+async def get_admin_by_login(
+        admin_in: GetAdmin,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    admin: Admin = await admin_by_login(
+        admin_in=admin_in,
+        session=session
+    )
+    return admin
+
+
+@router.post('/all/', response_model=List[AdminSchemas])
+async def get_admins(
+        admin: AdminSchemas = Depends(admins_all),
+        superuser: bool = Depends(validate_superuser),
+):
+    if superuser:
+        return admin
 
 
 @router.post('/{admin_id}/', response_model=AdminSchemas)
@@ -16,20 +51,6 @@ async def get_admin_by_id(
 ):
     if superuser:
         return admin
-
-
-@router.get('/', response_model=AdminSchemas)
-async def get_admin_by_login(
-        login: str,
-        password: str,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-):
-    admin: Admin = await admin_by_login(
-        login=login,
-        password=password,
-        session=session
-    )
-    return admin
 
 
 @router.post(
@@ -50,12 +71,12 @@ async def create_admin(
 
 
 @router.delete(
-    '/{admin_login}/',
+    '/{admin_id}/',
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_admin(
     superuser: bool = Depends(validate_superuser),
-    admin: Admin = Depends(admin_by_login_for_superuser),
+    admin: Admin = Depends(admin_by_id),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> None:
     if superuser:

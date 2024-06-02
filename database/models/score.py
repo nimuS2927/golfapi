@@ -33,7 +33,7 @@ class TotalScore(Base):
     tournament: Mapped['Tournament'] = relationship(back_populates='totalscores')
     user: Mapped['User'] = relationship(back_populates='totalscore')
     flight: Mapped['Flight'] = relationship(back_populates='totalscores')
-    scores: Mapped[List['Score']] = relationship(
+    scores: Mapped[Optional[List['Score']]] = relationship(
         back_populates='totalscore'
     )
     total: Mapped[Optional[int]]

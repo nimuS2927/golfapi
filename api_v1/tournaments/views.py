@@ -19,6 +19,20 @@ from database.models.serializer import serializer
 router = APIRouter(prefix='/tournaments', tags=['Tournaments'])
 
 
+@router.get('/game/{user_tg_id}/', response_model=List[schemas_tournament.Tournament])
+async def get_tournament_for_game(
+        tournaments: List[models.Tournament] = Depends(dep_tournaments.tournament_for_game),
+) -> List[models.Tournament]:
+    return tournaments
+
+
+@router.get('/totalscores/{tournament_id}/', response_model=Dict[str, Any])
+async def get_tournament_for_top(
+        tournament: Dict[str, Any] = Depends(dep_tournaments.tournament_for_top),
+) -> Dict[str, Any]:
+    return tournament
+
+
 @router.get('/name/{tournament_name}/', response_model=schemas_tournament.Tournament)
 async def get_tournament_by_name(
         tournament: models.Tournament = Depends(dep_tournaments.tournament_by_name),
@@ -33,11 +47,12 @@ async def get_nearest_tournaments(
     return tournaments
 
 
-@router.get('/{tournament_id}/', response_model=schemas_tournament.Tournament)
+@router.get('/{tournament_id}/{course_status}/', response_model=Dict[str, Any])
 async def get_tournament_by_id(
-        tournament: models.Tournament = Depends(dep_tournaments.tournament_by_id),
-) -> models.Tournament:
-    return tournament
+        tournament: models.Tournament = Depends(dep_tournaments.tournament_by_id_with_course),
+) -> Dict[str, Any]:
+    result_dict = serializer(target=tournament)
+    return result_dict
 
 
 @router.get('/', response_model=List[schemas_tournament.Tournament])
@@ -117,12 +132,12 @@ async def add_user_in_tournament(
 @router.post(
     '/distribute/',
     status_code=status.HTTP_200_OK,
-    response_model=dict[str, Any],
+    response_model=bool,
 )
 async def distribute_users_among_flights_in_tournament(
         tournament: models.Tournament = Depends(dep_tournaments.tournament_by_id_for_registration),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-) -> dict[str, Any]:
+) -> bool:
     users_list: List[models.User] = tournament.users
     flight_with_items = None
     if tournament.status is False:
@@ -145,7 +160,7 @@ async def distribute_users_among_flights_in_tournament(
                         name=name_flight,
                         session=session
                     )
-            if user not in flight_with_items.users:
+            if user not in flight_with_items.users and len(flight_with_items.users) < 4:
                 flight_with_items.users.append(user)
                 await session.commit()
             if tournament not in flight_with_items.tournaments:
@@ -157,8 +172,10 @@ async def distribute_users_among_flights_in_tournament(
         session=session,
         tournament_id=tournament.id,
     )
-    dict_tournament = serializer(target=tournament)
-    return dict_tournament
+    if tournament.status:
+        return True
+    else:
+        return False
 
 
 @router.post(
@@ -175,20 +192,6 @@ async def create_tournament(
         obj_in=tournament_in,
         obj=models.Tournament
     )
-    # tournament_with_items = await session.get(
-    #     models.Tournament,
-    #     tournament.id,
-    #     options=(selectinload(models.Tournament.flights),)
-    # )
-    # tournament_dict: Tournament = Tournament.model_validate(tournament)
-    # flights_list = []
-    # for i in range(tournament.max_flights):
-    #     flight = await crud_common.create_obj(
-    #         session=session,
-    #         obj_in={'tournaments': [tournament_dict]},
-    #         obj=models.Flight
-    #     )
-    #     tournament_with_items.flights.append(flight)
     return tournament
 
 

@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Dict, Any
 from fastapi import Path, Depends, HTTPException, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,14 +10,38 @@ from database import models
 from database.helper_for_db import db_helper
 
 
+async def tournament_by_id_with_course(
+        tournament_id: Annotated[int, Path],
+        course_status: Annotated[str, Path],
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> models.Tournament:
+    if course_status == 'False':
+        tournament = await crud_common.read_obj(
+            session=session,
+            obj_id=tournament_id,
+            obj=models.Tournament,
+        )
+    else:
+        tournament = await crud.get_tournament_with_course(
+            session=session,
+            tournament_id=tournament_id,
+        )
+    if tournament:
+        return tournament
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Tournament {tournament_id} not found"
+    )
+
+
 async def tournament_by_id(
         tournament_id: Annotated[int, Path],
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> models.Tournament:
-    tournament = await crud_common.read_obj(
+    tournament = await crud.get_tournament_with_course(
         session=session,
-        obj_id=tournament_id,
-        obj=models.Tournament,
+        tournament_id=tournament_id,
     )
     if tournament:
         return tournament
@@ -41,6 +65,33 @@ async def tournament_by_name(
         detail=f"Tournament '{name}' not found"
     )
 
+
+async def tournament_for_game(
+        user_tg_id: Annotated[int, Path],
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> List[models.Tournament]:
+    tournaments = await crud.get_tournaments_for_game(session=session, user_tg_id=user_tg_id)
+    if tournaments:
+        return tournaments
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Tournaments not found"
+    )
+
+
+async def tournament_for_top(
+        tournament_id: Annotated[int, Path],
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> Dict[str, Any]:
+    tournaments = await crud.get_tournament_for_top(session=session, tournament_id=tournament_id)
+    if tournaments:
+        return tournaments
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Tournament {tournament_id} not found"
+    )
 
 async def tournaments_all(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
