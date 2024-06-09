@@ -117,8 +117,8 @@ class ConfigAuthJWT(object):
         return cls._instance
 
     def __init__(self):
-        self.__PRIVATE_KEY_PATH: Path = Path(os.getenv("PRIVATE_KEY_PATH"))
-        self.__PUBLIC_KEY_PATH: Path = Path(os.getenv("PUBLIC_KEY_PATH"))
+        self.__PRIVATE_KEY_PATH: Path = Path.joinpath(c_basic.project_dir, 'certs', 'jwt-private.pem')
+        self.__PUBLIC_KEY_PATH: Path = Path.joinpath(c_basic.project_dir, 'certs', 'jwt-public.pem')
         self.__ALGORITHM: str = os.getenv("ALGORITHM")
         self.__SUPERUSER: str = os.getenv("AUTH_SUPERUSER")
         self.__PASSWORD: bytes = hash_password(os.getenv("AUTH_PASSWORD"))
@@ -172,6 +172,10 @@ class ConfigAuthJWT(object):
 
 
 c_auth_jwt = ConfigAuthJWT()
+#
+print(c_basic.project_dir)
+print(c_auth_jwt.public_key_path)
+print(c_auth_jwt.private_key_path)
 
 
 def get_db_url(engine: str = 'postgresql') -> str:
