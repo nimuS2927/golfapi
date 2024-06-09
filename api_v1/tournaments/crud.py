@@ -68,7 +68,7 @@ async def get_nearest_tournament_without_user(
 async def get_nearest_tournament(
         session: AsyncSession,
 ) -> Optional[List[Tournament]]:
-    today = date.today()
+    today = date.today() - timedelta(days=1)
     end = today + timedelta(days=30)
     stmt = select(Tournament).where(Tournament.start >= today, Tournament.end <= end).order_by(Tournament.start)
     result: Result = await session.execute(stmt)
@@ -83,7 +83,7 @@ async def get_tournaments_for_game(
     now = datetime.now()
     stmt = (select(Tournament).
             where(
-        Tournament.status == True,
+        # Tournament.status == True,
         Tournament.start <= now,
         Tournament.end >= now
     ).order_by(Tournament.start)

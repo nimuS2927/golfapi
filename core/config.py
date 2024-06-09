@@ -7,7 +7,7 @@ from core.utils import hash_password
 
 load_dotenv(find_dotenv())
 
-DEBUG = True
+DEBUG = False
 
 
 class ConfigBasic(object):
