@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, Optional
 
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +13,8 @@ from api_v1.users import dependencies as dep_users
 from api_v1.tournaments import dependencies as dep_tournaments
 
 from api_v1.tournaments import schemas as schemas_tournament
+from api_v1.scores import schemas as schemas_scores
+from api_v1.totalscores import schemas as schemas_totalscores
 from api_v1.flights import schemas as schemas_flights
 from database.models.serializer import serializer
 
@@ -94,12 +96,41 @@ async def update_tournament_partial(
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_tournament(
-        tournament: models.Tournament = Depends(dep_tournaments.tournament_by_id),
+        tournament: Optional[Dict[str, Any]] = Depends(dep_tournaments.tournament_by_id_for_delete),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> None:
+    if tournament.get('totalscores'):
+        for i_ts in tournament.get('totalscores'):
+            if i_ts.get('scores'):
+                for i_sc in i_ts.get('scores'):
+                    score_schema: schemas_scores.Score = schemas_scores.Score.model_validate(i_sc)
+                    score = await crud_common.read_obj(
+                        session=session,
+                        obj_id=score_schema.id,
+                        obj=models.Score
+                    )
+                    await crud_common.delete_obj(
+                        session=session,
+                        obj=score
+                    )
+            totalscore_schema: schemas_totalscores.TotalScore = schemas_totalscores.TotalScore.model_validate(i_ts)
+            totalscore = await crud_common.read_obj(
+                session=session,
+                obj_id=totalscore_schema.id,
+                obj=models.TotalScore
+            )
+            await crud_common.delete_obj(
+                session=session,
+                obj=totalscore
+            )
+    tournament_model = await crud_common.read_obj(
+        session=session,
+        obj_id=tournament['id'],
+        obj=models.Tournament
+    )
     await crud_common.delete_obj(
         session=session,
-        obj=tournament
+        obj=tournament_model
     )
 
 

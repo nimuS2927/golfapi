@@ -1,4 +1,4 @@
-from typing import Annotated, List, Dict, Any
+from typing import Annotated, List, Dict, Any, Optional
 from fastapi import Path, Depends, HTTPException, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -52,6 +52,23 @@ async def tournament_by_id(
     )
 
 
+async def tournament_by_id_for_delete(
+        tournament_id: Annotated[int, Path],
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> Optional[Dict[str, Any]]:
+    tournament = await crud.get_tournament_for_top(
+        session=session,
+        tournament_id=tournament_id
+    )
+    if tournament:
+        return tournament
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Tournament {tournament_id} not found"
+    )
+
+
 async def tournament_by_name(
         name: Annotated[str, Path],
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
@@ -92,6 +109,7 @@ async def tournament_for_top(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Tournament {tournament_id} not found"
     )
+
 
 async def tournaments_all(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
