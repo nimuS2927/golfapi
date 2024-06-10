@@ -139,33 +139,62 @@ async def distribute_users_among_flights_in_tournament(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> bool:
     users_list: List[models.User] = tournament.users
+    flights_list: List[models.Flight] = tournament.flights
+    users_in_flights = []
+    not_full_flights = []
+    full_flights_numbers = []
+    if flights_list:
+        for flight in flights_list:
+            flight_with_items = await crud_flights.get_flight_with_items_by_name(
+                name=flight.name,
+                session=session
+            )
+            if len(flight_with_items.users) < 4:
+                not_full_flights.append(flight_with_items)
+            else:
+                full_flights_numbers.append(int(flight_with_items.name.split('_')[-1]))
+            users_in_flights.extend(flight_with_items.users)
+    last_name_flight = None
+    if full_flights_numbers:
+        full_flights_numbers.sort()
+        last_name_flight = f't_{tournament.id}_f_{full_flights_numbers[-1]}'
+
+    users_list = [user for user in users_list if user not in users_in_flights]
     flight_with_items = None
-    if tournament.status is False:
-        for i, user in enumerate(users_list):
-            if i % 4 == 0:
-                name_flight = f't_{tournament.id}_f_{i // 4 + 1}'
-                try:
-                    flight_in: schemas_flights.CreateFlight = schemas_flights.CreateFlight(name=name_flight)
-                    flight: models.Flight = await crud_flights.create_flight_for_distribute_users(
-                        session=session,
-                        flight_in=flight_in,
-                    )
-                    flight_with_items = await crud_flights.get_flight_with_items_by_name(
-                        name=name_flight,
-                        session=session
-                    )
-                except:
-                    await session.rollback()
-                    flight_with_items = await crud_flights.get_flight_with_items_by_name(
-                        name=name_flight,
-                        session=session
-                    )
-            if user not in flight_with_items.users and len(flight_with_items.users) < 4:
-                flight_with_items.users.append(user)
-                await session.commit()
-            if tournament not in flight_with_items.tournaments:
-                flight_with_items.tournaments.append(tournament)
-                await session.commit()
+    cur_flight = None
+    while users_list:
+        cur_user = users_list.pop()
+        if not cur_flight:
+            if not_full_flights:
+                cur_flight = not_full_flights.pop()
+                if not last_name_flight:
+                    last_name_flight = cur_flight.name
+                else:
+                    if int(last_name_flight.split('_')[-1]) < int(cur_flight.name.split('_')[-1]):
+                        last_name_flight = cur_flight.name
+            else:
+                if not last_name_flight:
+                    last_num = 0
+                else:
+                    last_num = int(last_name_flight.split('_')[-1])
+                name_flight = f't_{tournament.id}_f_{last_num + 1}'
+                flight_in: schemas_flights.CreateFlight = schemas_flights.CreateFlight(name=name_flight)
+                flight: models.Flight = await crud_flights.create_flight_for_distribute_users(
+                    session=session,
+                    flight_in=flight_in,
+                )
+                cur_flight = await crud_flights.get_flight_with_items_by_name(
+                    name=name_flight,
+                    session=session
+                )
+        if tournament not in cur_flight.tournaments:
+            cur_flight.tournaments.append(tournament)
+            await session.commit()
+        cur_flight.users.append(cur_user)
+        await session.commit()
+        if len(cur_flight.users) == 4:
+            cur_flight = None
+    if not tournament.status:
         tournament.status = True
         await session.commit()
     tournament = await crud_tournaments.get_tournament_with_items_for_registration(

@@ -172,10 +172,6 @@ class ConfigAuthJWT(object):
 
 
 c_auth_jwt = ConfigAuthJWT()
-#
-print(c_basic.project_dir)
-print(c_auth_jwt.public_key_path)
-print(c_auth_jwt.private_key_path)
 
 
 def get_db_url(engine: str = 'postgresql') -> str:
